@@ -1,5 +1,9 @@
 package io.github.richardyin.chess;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -11,12 +15,13 @@ import javax.script.ScriptException;
  */
 public class ChessGui {
 	
-	public static void main(String[] args) throws ScriptException {
-		// Hello World testing with Nashorn
-		String cmd1 = "var hello = 'Hello World';";
-		String cmd2 = "print(hello);";
+	public static void main(String[] args) throws ScriptException, FileNotFoundException {
+		// Load script from a file into a string
+		Scanner scriptScanner = new Scanner(new File("chess.js"));
+		String script = scriptScanner.useDelimiter("\\A").next();
+		scriptScanner.close();
+		
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-		engine.eval(cmd1);
-		engine.eval(cmd2);
+		engine.eval(script);
 	}
 }
