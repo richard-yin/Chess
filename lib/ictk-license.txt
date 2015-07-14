@@ -1,2 +1,0 @@
-Internet Chess Toolkit used in this project obtained from http://jvarsoke.github.io/ictk/
-ictk is distributed under the MIT license: http://opensource.org/licenses/MIT
