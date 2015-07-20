@@ -18,32 +18,27 @@ import javax.swing.JButton;
 public class GridButton extends JButton {
 	private ChessPiece occupant;
 	private boolean isBlack;
-
-	// Display an opaque ("black" in the font) piece if occupant colour is
-	// different from square colour; use this map to convert from Piece object
-	// to font
-	private static Map<PieceData, Character> referenceMap;
+	private Map<Byte, Character> referenceMap;
 
 	static {
+	}
+
+	public GridButton() {
 		byte[] indices = { Pawn.INDEX, Bishop.INDEX, Knight.INDEX, Rook.INDEX,
 				Queen.INDEX, King.INDEX }; // indices in the order that appears
 											// in the font
-		Map<PieceData, Character> charMap = new HashMap<>();
+		Map<Byte, Character> charMap = new HashMap<>();
 		// White pieces are 'i' to 'n' while black pieces are 'I' to 'N'
 		char currentCharacter = 'I'; // different-colour pawn
-		char charDifference = (char) ('A' - 'a'); // diff btwn capital,
+		char charDifference = (char) ('a' - 'A'); // diff btwn capital,
 													// lowercase
 		for (byte index : indices) {
-			charMap.put(new PieceData(index, false), currentCharacter);
-			charMap.put(new PieceData(index, true),
+			charMap.put(index, currentCharacter);
+			charMap.put((byte) (index + ChessPiece.BLACK_OFFSET),
 					(char) (currentCharacter + charDifference));
 			currentCharacter++;
 		}
 		referenceMap = Collections.unmodifiableMap(charMap);
-	}
-
-	public GridButton() {
-
 	}
 
 	public ChessPiece getOccupant() {
@@ -52,9 +47,13 @@ public class GridButton extends JButton {
 
 	public void setOccupant(ChessPiece occupant) {
 		this.occupant = occupant;
-		PieceData occupantData = new PieceData(occupant.getIndex(),
-				(occupant.isBlack() == isBlack));
-		setText(referenceMap.get(occupantData).toString());
+		if (occupant == null)
+			setText("");
+		else if (isBlack) { // invert colour for black squares
+			setText(referenceMap.get(getOppositeIndex(occupant.getIndex()))
+					.toString());
+		} else
+			setText(referenceMap.get(occupant.getIndex()).toString());
 	}
 
 	public boolean isBlack() {
@@ -68,34 +67,14 @@ public class GridButton extends JButton {
 			setForeground(Color.WHITE);
 		} else {
 			setBackground(Color.WHITE);
-			setBackground(Color.BLACK);
+			setForeground(Color.BLACK);
 		}
 	}
 
-	private static class PieceData {
-		private boolean sameColour;
-		private byte index; // Refer to <PieceClassName>.INDEX
-
-		public PieceData(byte index, boolean sameColour) {
-			this.sameColour = sameColour;
-			this.index = index;
-		}
-
-		// Piece data with the same type and colour are equal
-		@Override
-		public int hashCode() {
-			int code = index;
-			if (sameColour)
-				code += 8; // indices are from 0 to 5
-			return code;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (!(o instanceof PieceData))
-				return false;
-			PieceData data = (PieceData) o;
-			return data.index == index && data.index == index;
-		}
+	private byte getOppositeIndex(byte index) {
+		if (index >= ChessPiece.BLACK_OFFSET)
+			return (byte) (index - ChessPiece.BLACK_OFFSET);
+		else
+			return (byte) (index + ChessPiece.BLACK_OFFSET);
 	}
 }

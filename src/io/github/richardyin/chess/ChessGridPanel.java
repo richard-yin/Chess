@@ -20,14 +20,15 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 
 	private GridButton[][] buttonGrid = new GridButton[8][8];
 	private boolean isWhiteOnBottom = true;
+	private ChessBoard board;
 
-	public ChessGridPanel() throws IOException, FontFormatException {
+	public ChessGridPanel(Board board) throws IOException, FontFormatException {
 		setLayout(null);
 
 		// load font with chess icons
 		try {
 			Font chessFont = Font.createFont(Font.TRUETYPE_FONT,
-					new File("ChessAlpha2.ttf")).deriveFont(24f);
+					new File("ChessAlpha2.ttf")).deriveFont(32f);
 
 			// set up grid
 			for (int x = 0; x < 8; x++) {
@@ -43,6 +44,8 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 					add(buttonGrid[x][y]);
 				}
 			}
+
+			setBoard(board);
 		} catch (FontFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(this, "Could not load chess font",
@@ -54,19 +57,20 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 	@Override
 	public Board getBoard() {
 		// TODO Auto-generated method stub
-		return null;
+		return board;
 	}
 
 	@Override
 	public void setBoard(Board board) {
 		if (board instanceof ChessBoard) {
 			ChessBoard chessBoard = (ChessBoard) board;
-			for (int x = 1; x <= 8; x++) {
-				for (int y = 1; y <= 8; y++) {
-					Square sq = chessBoard.getSquare(x, y);
+			for (int x = 0; x <= 7; x++) {
+				for (int y = 0; y <= 7; y++) {
+					Square sq = chessBoard.getSquare(x + 1, y + 1);
 					buttonGrid[x][y].setOccupant(sq.getOccupant());
 				}
 			}
+			this.board = chessBoard;
 		} else
 			throw new IllegalArgumentException("Wrong type of board given");
 	}

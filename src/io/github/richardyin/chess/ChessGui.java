@@ -1,5 +1,7 @@
 package io.github.richardyin.chess;
 
+import ictk.boardgame.chess.ChessGame;
+
 import java.awt.FontFormatException;
 import java.io.IOException;
 
@@ -13,11 +15,13 @@ import javax.swing.JFrame;
  */
 public class ChessGui extends JFrame {
 	private ChessGridPanel gridPanel;
+	ChessGame game = new ChessGame();
 
 	public static void main(String[] args) {
 		try {
 			new ChessGui().setVisible(true);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.exit(1);
 		}
 	}
@@ -28,8 +32,9 @@ public class ChessGui extends JFrame {
 		setTitle("Chess");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(null);
-		gridPanel = new ChessGridPanel();
+		gridPanel = new ChessGridPanel(game.getBoard());
 		gridPanel.setBounds(40, 40, 480, 480);
 		add(gridPanel);
+
 	}
 }
