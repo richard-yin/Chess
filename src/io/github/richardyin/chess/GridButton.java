@@ -13,29 +13,31 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 public class GridButton extends JButton {
 	private ChessPiece occupant;
 	private boolean isBlack;
-	private Map<Byte, Character> referenceMap;
+	private static Map<Byte, Character> referenceMap;
+	private boolean isSelected;
+	
+	private static final Border defaultBorder = UIManager.getBorder("Button.border");
+	private static final Border selectedBorder = BorderFactory.createLineBorder(Color.YELLOW, 5);
 
 	static {
-	}
-
-	public GridButton() {
 		byte[] indices = { Pawn.INDEX, Bishop.INDEX, Knight.INDEX, Rook.INDEX,
-				Queen.INDEX, King.INDEX }; // indices in the order that appears
-											// in the font
+				Queen.INDEX, King.INDEX }; // indices in the order that appears in the font
 		Map<Byte, Character> charMap = new HashMap<>();
 		// White pieces are 'i' to 'n' while black pieces are 'I' to 'N'
 		char currentCharacter = 'I'; // different-colour pawn
-		char charDifference = (char) ('a' - 'A'); // diff btwn capital,
-													// lowercase
+		char charDifference = (char) ('a' - 'A'); // diff btwn capital, lowercase
 		for (byte index : indices) {
 			charMap.put(index, currentCharacter);
 			charMap.put((byte) (index + ChessPiece.BLACK_OFFSET),
-					(char) (currentCharacter + charDifference));
+					(char) (currentCharacter + charDifference)); 
 			currentCharacter++;
 		}
 		referenceMap = Collections.unmodifiableMap(charMap);
@@ -76,5 +78,15 @@ public class GridButton extends JButton {
 			return (byte) (index - ChessPiece.BLACK_OFFSET);
 		else
 			return (byte) (index + ChessPiece.BLACK_OFFSET);
+	}
+
+	public void setSelected(boolean selected) {
+		isSelected = selected;
+		if(selected) setBorder(selectedBorder);
+		else setBorder(defaultBorder);
+	}
+
+	public boolean getSelected() {
+		return isSelected;
 	}
 }

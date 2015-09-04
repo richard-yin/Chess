@@ -3,12 +3,15 @@ package io.github.richardyin.chess;
 import ictk.boardgame.Board;
 import ictk.boardgame.BoardListener;
 import ictk.boardgame.chess.ChessBoard;
+import ictk.boardgame.chess.ChessGame;
 import ictk.boardgame.chess.Square;
 import ictk.boardgame.chess.ui.ChessBoardDisplay;
 import ictk.boardgame.ui.BoardDisplay;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -20,9 +23,23 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 
 	private GridButton[][] buttonGrid = new GridButton[8][8];
 	private boolean isWhiteOnBottom = true;
-	private ChessBoard board;
+	private ChessGame game;
+	private GridButton selectedButton;
+	
+	private ActionListener buttonListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(!(e.getSource() instanceof GridButton)
+					|| e.getSource() == selectedButton) return; // invalid select
+			GridButton newButton = (GridButton) e.getSource();
+			if(selectedButton != null) selectedButton.setSelected(false);
+			selectedButton = newButton;
+			selectedButton.setSelected(true);
+		}
+	};
 
-	public ChessGridPanel(Board board) throws IOException, FontFormatException {
+	public ChessGridPanel(ChessGame game) throws IOException,
+			FontFormatException {
 		setLayout(null);
 
 		// load font with chess icons
@@ -42,10 +59,11 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 					}
 					buttonGrid[x][y].setFont(chessFont);
 					add(buttonGrid[x][y]);
+					buttonGrid[x][y].addActionListener(buttonListener);
 				}
 			}
-
-			setBoard(board);
+			this.game = game;
+			setBoard(game.getBoard());
 		} catch (FontFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(this, "Could not load chess font",
@@ -57,7 +75,7 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 	@Override
 	public Board getBoard() {
 		// TODO Auto-generated method stub
-		return board;
+		return game.getBoard();
 	}
 
 	@Override
@@ -70,7 +88,8 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 					buttonGrid[x][y].setOccupant(sq.getOccupant());
 				}
 			}
-			this.board = chessBoard;
+			if (game.getBoard() != board)
+				game.setBoard(board);
 		} else
 			throw new IllegalArgumentException("Wrong type of board given");
 	}

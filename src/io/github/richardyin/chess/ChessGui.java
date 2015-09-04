@@ -32,9 +32,8 @@ public class ChessGui extends JFrame {
 		setTitle("Chess");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(null);
-		gridPanel = new ChessGridPanel(game.getBoard());
+		gridPanel = new ChessGridPanel(game);
 		gridPanel.setBounds(40, 40, 480, 480);
 		add(gridPanel);
-
 	}
 }
