@@ -25,7 +25,7 @@ public class GridButton extends JButton {
 	private ChessPiece occupant;
 	private boolean isBlack;
 	private static Map<Byte, Character> referenceMap;
-	private SquareState state;
+	private SquareState state = SquareState.NONE;
 	private static List<Square> emptySquareList = new ArrayList<>(0);
 	
 	private static final Border defaultBorder = UIManager.getBorder("Button.border");
