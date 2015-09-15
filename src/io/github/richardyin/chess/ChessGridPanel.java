@@ -7,6 +7,7 @@ import ictk.boardgame.chess.ChessGame;
 import ictk.boardgame.chess.Square;
 import ictk.boardgame.chess.ui.ChessBoardDisplay;
 import ictk.boardgame.ui.BoardDisplay;
+import io.github.richardyin.chess.GridButton.SquareState;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -14,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,15 +29,18 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 	private ChessGame game;
 	private GridButton selectedButton;
 	
+	private List<GridButton> highlightedButtons = new ArrayList<>();
+	
 	private ActionListener buttonListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(!(e.getSource() instanceof GridButton)
-					|| e.getSource() == selectedButton) return; // invalid select
+			if(!(e.getSource() instanceof GridButton)) return; // invalid select
 			GridButton newButton = (GridButton) e.getSource();
-			if(selectedButton != null) selectedButton.setSelected(false);
-			selectedButton = newButton;
-			selectedButton.setSelected(true);
+			switch(newButton.getState()) {
+			case SELECTED: return; //already selected, ignore
+			case NONE: selectButton(newButton);
+			default: return; // TODO implement moves
+			}
 		}
 	};
 
@@ -92,6 +98,28 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 				game.setBoard(board);
 		} else
 			throw new IllegalArgumentException("Wrong type of board given");
+	}
+	
+	private void selectButton(GridButton newButton) {
+		for(GridButton button : highlightedButtons) {
+			button.setState(SquareState.NONE);
+		}
+		highlightedButtons.clear();
+		selectedButton = newButton;
+		selectedButton.setState(SquareState.SELECTED);
+		highlightedButtons.add(selectedButton);
+		if(selectedButton.getOccupant() == null) return;
+		
+		// highlight possible moves if it is that player's turn
+		boolean isBlackMove = game.getPlayerToMove() == 1; // 0 for white, 1 for black
+		if(isBlackMove == selectedButton.getOccupant().isBlack()) return;
+		for(Square square : selectedButton.getLegalDests()) {
+			int x = square.getX() - 1;
+			int y = square.getY() - 1;
+			if(square.isOccupied()) buttonGrid[x][y].setState(SquareState.CAN_CAPTURE);
+			else buttonGrid[x][y].setState(SquareState.CAN_MOVE);
+			highlightedButtons.add(buttonGrid[x][y]);
+		}
 	}
 
 	@Override

@@ -7,10 +7,13 @@ import ictk.boardgame.chess.Knight;
 import ictk.boardgame.chess.Pawn;
 import ictk.boardgame.chess.Queen;
 import ictk.boardgame.chess.Rook;
+import ictk.boardgame.chess.Square;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -22,10 +25,17 @@ public class GridButton extends JButton {
 	private ChessPiece occupant;
 	private boolean isBlack;
 	private static Map<Byte, Character> referenceMap;
-	private boolean isSelected;
+	private SquareState state;
+	private static List<Square> emptySquareList = new ArrayList<>(0);
 	
 	private static final Border defaultBorder = UIManager.getBorder("Button.border");
-	private static final Border selectedBorder = BorderFactory.createLineBorder(Color.YELLOW, 5);
+	private static final Border selectedBorder = BorderFactory.createLineBorder(Color.YELLOW, 2);
+	private static final Border moveBorder = BorderFactory.createLineBorder(Color.CYAN, 2);
+	private static final Border captureBorder = BorderFactory.createLineBorder(Color.RED, 2);
+	
+	public enum SquareState {
+		NONE, SELECTED, CAN_MOVE, CAN_CAPTURE
+	}
 
 	static {
 		byte[] indices = { Pawn.INDEX, Bishop.INDEX, Knight.INDEX, Rook.INDEX,
@@ -80,13 +90,22 @@ public class GridButton extends JButton {
 			return (byte) (index + ChessPiece.BLACK_OFFSET);
 	}
 
-	public void setSelected(boolean selected) {
-		isSelected = selected;
-		if(selected) setBorder(selectedBorder);
-		else setBorder(defaultBorder);
+	public void setState(SquareState state) {
+		this.state = state;
+		switch(state) {
+		case NONE: setBorder(defaultBorder); break;
+		case SELECTED: setBorder(selectedBorder); break;
+		case CAN_MOVE: setBorder(moveBorder); break;
+		case CAN_CAPTURE: setBorder(captureBorder); break;
+		}
 	}
 
-	public boolean getSelected() {
-		return isSelected;
+	public SquareState getState() {
+		return state;
+	}
+	
+	public List<Square> getLegalDests() {
+		if(occupant == null) return emptySquareList;
+		return occupant.getLegalDests();
 	}
 }
