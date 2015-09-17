@@ -1,9 +1,13 @@
 package io.github.richardyin.chess;
 
+import ictk.boardgame.AmbiguousMoveException;
 import ictk.boardgame.Board;
 import ictk.boardgame.BoardListener;
+import ictk.boardgame.History;
+import ictk.boardgame.IllegalMoveException;
 import ictk.boardgame.chess.ChessBoard;
 import ictk.boardgame.chess.ChessGame;
+import ictk.boardgame.chess.ChessMove;
 import ictk.boardgame.chess.Square;
 import ictk.boardgame.chess.ui.ChessBoardDisplay;
 import ictk.boardgame.ui.BoardDisplay;
@@ -28,6 +32,7 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 	private boolean isWhiteOnBottom = true;
 	private ChessGame game;
 	private GridButton selectedButton;
+	private History history;
 	
 	private List<GridButton> highlightedButtons = new ArrayList<>();
 	
@@ -38,8 +43,8 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 			GridButton newButton = (GridButton) e.getSource();
 			switch(newButton.getState()) {
 			case SELECTED: return; //already selected, ignore
-			case NONE: selectButton(newButton);
-			default: return; // TODO implement moves
+			case NONE: selectButton(newButton); return;
+			default: moveTo(newButton.getSquareX(), newButton.getSquareY());
 			}
 		}
 	};
@@ -56,7 +61,7 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 			// set up grid
 			for (int x = 0; x < 8; x++) {
 				for (int y = 0; y < 8; y++) {
-					buttonGrid[x][y] = new GridButton();
+					buttonGrid[x][y] = new GridButton(x + 1, y + 1);
 					buttonGrid[x][y].setBounds(60 * x, 60 * y, 60, 60);
 					if (x % 2 == y % 2) {
 						buttonGrid[x][y].setBlack(false);
@@ -69,6 +74,7 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 				}
 			}
 			this.game = game;
+			history = game.getHistory();
 			setBoard(game.getBoard());
 		} catch (FontFormatException | IOException e) {
 			// TODO Auto-generated catch block
@@ -106,19 +112,32 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 		}
 		highlightedButtons.clear();
 		selectedButton = newButton;
+		if(newButton == null) return;
 		selectedButton.setState(SquareState.SELECTED);
 		highlightedButtons.add(selectedButton);
 		if(selectedButton.getOccupant() == null) return;
 		
 		// highlight possible moves if it is that player's turn
-		boolean isBlackMove = game.getPlayerToMove() == 1; // 0 for white, 1 for black
-		if(isBlackMove == selectedButton.getOccupant().isBlack()) return;
 		for(Square square : selectedButton.getLegalDests()) {
 			int x = square.getX() - 1;
 			int y = square.getY() - 1;
 			if(square.isOccupied()) buttonGrid[x][y].setState(SquareState.CAN_CAPTURE);
 			else buttonGrid[x][y].setState(SquareState.CAN_MOVE);
 			highlightedButtons.add(buttonGrid[x][y]);
+		}
+	}
+	
+	private void moveTo(int x, int y) {
+		if(selectedButton == null) return;
+		try {
+			ChessMove move = new ChessMove((ChessBoard) game.getBoard(),
+					selectedButton.getSquareX(), selectedButton.getSquareY(), x, y);
+			history.add(move);
+			setBoard(game.getBoard());
+			selectButton(null);
+		} catch (IllegalMoveException | AmbiguousMoveException | IndexOutOfBoundsException e) {
+				// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

@@ -27,6 +27,7 @@ public class GridButton extends JButton {
 	private static Map<Byte, Character> referenceMap;
 	private SquareState state = SquareState.NONE;
 	private static List<Square> emptySquareList = new ArrayList<>(0);
+	private int squareX, squareY;
 	
 	private static final Border defaultBorder = UIManager.getBorder("Button.border");
 	private static final Border selectedBorder = BorderFactory.createLineBorder(Color.YELLOW, 2);
@@ -47,10 +48,16 @@ public class GridButton extends JButton {
 		for (byte index : indices) {
 			charMap.put(index, currentCharacter);
 			charMap.put((byte) (index + ChessPiece.BLACK_OFFSET),
-					(char) (currentCharacter + charDifference)); 
+					(char) (currentCharacter + charDifference));
 			currentCharacter++;
 		}
 		referenceMap = Collections.unmodifiableMap(charMap);
+	}
+	
+	public GridButton(int x, int y) {
+		super();
+		this.setSquareX(x);
+		this.setSquareY(y);
 	}
 
 	public ChessPiece getOccupant() {
@@ -107,5 +114,21 @@ public class GridButton extends JButton {
 	public List<Square> getLegalDests() {
 		if(occupant == null) return emptySquareList;
 		return occupant.getLegalDests();
+	}
+
+	public int getSquareX() {
+		return squareX;
+	}
+
+	public void setSquareX(int squareX) {
+		this.squareX = squareX;
+	}
+
+	public int getSquareY() {
+		return squareY;
+	}
+
+	public void setSquareY(int squareY) {
+		this.squareY = squareY;
 	}
 }
