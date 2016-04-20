@@ -113,6 +113,10 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 		highlightedButtons.clear();
 		selectedButton = newButton;
 		if(newButton == null) return;
+		if(newButton.getOccupant() == null) return;
+		boolean isButtonBlack = newButton.getOccupant().isBlack();
+		boolean isCurrentMoveBlack = game.getPlayerToMove() == 1;
+		if(isButtonBlack != isCurrentMoveBlack) return;
 		selectedButton.setState(SquareState.SELECTED);
 		highlightedButtons.add(selectedButton);
 		if(selectedButton.getOccupant() == null) return;

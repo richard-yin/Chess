@@ -46,9 +46,8 @@ public class GridButton extends JButton {
 		char currentCharacter = 'I'; // different-colour pawn
 		char charDifference = (char) ('a' - 'A'); // diff btwn capital, lowercase
 		for (byte index : indices) {
-			charMap.put(index, currentCharacter);
-			charMap.put((byte) (index + ChessPiece.BLACK_OFFSET),
-					(char) (currentCharacter + charDifference));
+			charMap.put((byte) (index + ChessPiece.BLACK_OFFSET), currentCharacter);
+			charMap.put(index, (char) (currentCharacter + charDifference));
 			currentCharacter++;
 		}
 		referenceMap = Collections.unmodifiableMap(charMap);
