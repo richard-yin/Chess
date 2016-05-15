@@ -2,7 +2,6 @@ package io.github.richardyin.chess;
 
 import ictk.boardgame.AmbiguousMoveException;
 import ictk.boardgame.Board;
-import ictk.boardgame.BoardListener;
 import ictk.boardgame.History;
 import ictk.boardgame.IllegalMoveException;
 import ictk.boardgame.chess.ChessBoard;
@@ -25,8 +24,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
-		BoardDisplay, BoardListener {
+public class ChessGridPanel extends JPanel implements ChessBoardDisplay, BoardDisplay {
 
 	private GridButton[][] buttonGrid = new GridButton[8][8];
 	private boolean isWhiteOnBottom = true;
@@ -62,7 +60,7 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 			for (int x = 0; x < 8; x++) {
 				for (int y = 0; y < 8; y++) {
 					buttonGrid[x][y] = new GridButton(x + 1, y + 1);
-					buttonGrid[x][y].setBounds(60 * x, 60 * y, 60, 60);
+					buttonGrid[x][y].setBounds(60 * x, 420 - 60 * y, 60, 60);
 					if (x % 2 == y % 2) {
 						buttonGrid[x][y].setBlack(false);
 					} else {
@@ -82,6 +80,13 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 					"Error", JOptionPane.ERROR_MESSAGE);
 			throw e;
 		}
+	}
+	
+	public void setGame(ChessGame game) {
+		this.game = game;
+		history = game.getHistory();
+		setBoard(game.getBoard());
+		game.getBoard().addBoardListener(this);
 	}
 
 	@Override
@@ -147,52 +152,56 @@ public class ChessGridPanel extends JPanel implements ChessBoardDisplay,
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+		System.out.println("Update called");
 	}
 
 	@Override
 	public boolean getSideToMoveOnBottom() {
-		return true;
+		System.out.println("getSideToMoveOnBottom called");
+		return false;
 	}
 
 	@Override
 	public int getVisibleCoordinates() {
+		System.out.println("getVisibleCoordinates called");
 		return 0xffffffff;
 	}
 
 	@Override
 	public boolean isLowerCaseCoordinates() {
+		System.out.println("isLowercaseCoordinates called");
 		return false;
 	}
 
 	@Override
 	public boolean isWhiteOnBottom() {
+		System.out.println("isWhiteOnBottom caled");
 		return isWhiteOnBottom;
 	}
 
 	@Override
 	public void setLowerCaseCoordinates(boolean arg0) {
-		// not supported
+		System.out.println("setLowercaseCoordinates called");
 	}
 
 	@Override
 	public void setSideToMoveOnBottom(boolean arg0) {
-		// not supported
+		System.out.println("setSideToMoveOnBottom called");
 	}
 
 	@Override
 	public void setVisibleCoordinates(int arg0) {
-		// not supported
-
+		System.out.println("setVisibleCoordinates called");
 	}
 
 	@Override
 	public void setWhiteOnBottom(boolean b) {
-		// not supported
+		System.out.println("setWhiteOnBottom called");
 	}
 
 	@Override
-	public void boardUpdate(Board board, int updateType) {
-
+	public void boardUpdate(Board arg0, int arg1) {
+		System.out.println("boardUpdate called");
+		
 	}
 }
